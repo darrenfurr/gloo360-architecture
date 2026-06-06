@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gloo360 — Multi-Customer Cloud Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   GLOO360 DESIGN SYSTEM
+   Brand: Gold #F5B800 · Dark #111111 · White
+   Fonts: Poppins (display) + DM Mono (code)
+   Theme: Light / Enterprise Premium
+═══════════════════════════════════════════ */
+:root {
+  /* Gloo Brand */
+  --gold:         #F5B800;
+  --gold-mid:     #E8950A;
+  --gold-dim:     #FEF3C7;
+  --gold-dark:    #92600A;
+  --gloo-dark:    #111111;
+  --gloo-dark-2:  #1F2937;
+  --gloo-dark-3:  #374151;
+
+  /* Backgrounds */
+  --bg:           #F9F8F5;
+  --bg-card:      #FFFFFF;
+  --bg-elevated:  #F3F2EF;
+
+  /* Functional */
+  --green:        #16A34A;
+  --green-dim:    #DCFCE7;
+  --blue:         #1D4ED8;
+  --blue-dim:     #DBEAFE;
+  --teal:         #0D9488;
+  --teal-dim:     #CCFBF1;
+  --red:          #DC2626;
+  --red-dim:      #FEE2E2;
+  --orange:       #EA580C;
+  --orange-dim:   #FFEDD5;
+  --amber:        #D97706;
+  --amber-dim:    #FEF3C7;
+  --purple:       #7C3AED;
+
+  /* Text */
+  --text:         #111111;
+  --text-2:       #4B5563;
+  --text-3:       #9CA3AF;
+
+  /* Structure */
+  --border:       #E5E3DD;
+  --border-2:     #D1CFC9;
+  --shadow-sm:    0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow:       0 2px 8px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+  --shadow-lg:    0 8px 24px rgba(0,0,0,0.10), 0 16px 40px rgba(0,0,0,0.07);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  padding: 24px 28px 40px;
+  overflow-x: auto;
+}
+
+/* subtle warm ambient glow */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 5% 5%, rgba(245,184,0,0.05) 0%, transparent 100%),
+    radial-gradient(ellipse 50% 30% at 95% 95%, rgba(245,184,0,0.03) 0%, transparent 100%);
+  pointer-events: none; z-index: 0;
+}
+
+
+.page-wrap {
+  position: relative; z-index: 1;
+  max-width: 1560px; margin: 0 auto;
+}
+
+/* ── TITLE BAR ─────────────────────────────── */
+.title-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px;
+  padding: 20px 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+.title-main {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px; font-weight: 800; letter-spacing: -0.01em;
+  color: var(--text);
+}
+.title-main em {
+  background: linear-gradient(90deg, #F9D423, #E8950A);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; font-style: normal;
+}
+.title-sub {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-3); margin-top: 4px;
+}
+.title-note {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 400; letter-spacing: 0;
+  color: var(--text-3); margin-top: 6px; line-height: 1.5;
+}
+.title-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; flex-shrink: 0; }
+.title-actions { display: flex; gap: 6px; }
+.title-badge-row { display: flex; gap: 8px; }
+.badge {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 5px 12px;
+  border-radius: 20px; border: 1px solid; white-space: nowrap;
+}
+.b-green { color: var(--green);  border-color: var(--green-dim);  background: var(--green-dim); }
+.b-blue  { color: var(--blue);   border-color: var(--blue-dim);   background: var(--blue-dim);  }
+.b-amber { color: var(--gold-dark); border-color: var(--gold-dim); background: var(--gold-dim); }
+
+/* ── TIER WRAPPER ──────────────────────────── */
+.diagram {
+  display: grid;
+  grid-template-columns: 260px 1fr 260px;
+  grid-template-rows: auto auto auto auto;
+  grid-template-areas:
+    "mgmt mgmt mgmt"
+    "cat  cust tool"
+    "obs  obs  obs"
+    "bot  bot  bot";
+  gap: 16px;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.tier { border-radius: 10px; animation: fadeUp 0.5s ease both; }
+.tier:nth-child(1) { animation-delay: 0.05s; }
+.tier:nth-child(2) { animation-delay: 0.12s; }
+.tier:nth-child(3) { animation-delay: 0.18s; }
+.tier:nth-child(4) { animation-delay: 0.24s; }
+.t-mgmt { grid-area: mgmt; }
+.t-cat  { grid-area: cat;  }
+.t-cust { grid-area: cust; }
+.t-tool { grid-area: tool; }
+.t-obs  { grid-area: obs;  }
+.bottom-row { grid-area: bot; }
+
+/* catalog + tooling columns — same dark authority */
+.t-cat .tier-hdr  { background: var(--gloo-dark); border: 1px solid var(--gloo-dark-3); border-bottom: none; color: var(--gold); }
+.t-cat .tier-body  { background: var(--bg-card); border-color: var(--border); }
+.t-tool .tier-hdr { background: var(--gloo-dark); border: 1px solid var(--gloo-dark-3); border-bottom: none; color: #F9FAFB; }
+.t-tool .tier-body { background: var(--bg-card); border-color: var(--border); }
+
+.tier-hdr {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 10px 16px; border-radius: 10px 10px 0 0;
+  display: flex; align-items: center; gap: 8px;
+}
+.tier-hdr .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; opacity: 0.8; }
+.tier-body { padding: 16px; border-radius: 0 0 10px 10px; border: 1px solid; border-top: none; }
+
+/* management — dark authority */
+.t-mgmt .tier-hdr { background: var(--gloo-dark); border: 1px solid var(--gloo-dark-3); border-bottom: none; color: var(--gold); }
+.t-mgmt .tier-body { background: var(--bg-card); border-color: var(--border); }
+
+/* platform — same dark authority as management */
+.t-plat .tier-hdr { background: var(--gloo-dark); border: 1px solid var(--gloo-dark-3); border-bottom: none; color: #F9FAFB; }
+.t-plat .tier-body { background: var(--bg-card); border-color: var(--border); }
+
+/* customers — Gloo gold */
+.t-cust .tier-hdr { background: var(--gloo-dark); border: 1px solid var(--gloo-dark-3); border-bottom: none; color: var(--gold); }
+.t-cust .tier-body { background: linear-gradient(180deg, #FFFDF5 0%, #FFFFFF 50%); border-color: var(--border); }
+
+/* observability — same dark authority as all other tiers */
+.t-obs .tier-hdr { background: var(--gloo-dark); border: 1px solid var(--gloo-dark-3); border-bottom: none; color: var(--gold); }
+.t-obs .tier-body { background: var(--bg-card); border-color: var(--border); }
+.obs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+/* ── MANAGEMENT SERVICE ROW ─────────────────── */
+.svc-row { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; }
+
+.svc-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px 13px;
+  cursor: default; transition: all 0.18s; position: relative;
+  box-shadow: var(--shadow-sm);
+}
+.svc-box:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.svc-box .ico { font-size: 20px; display: block; margin-bottom: 7px; }
+.svc-box .name {
+  font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 700;
+  color: var(--text); line-height: 1.3; margin-bottom: 4px;
+}
+.svc-box .detail {
+  font-size: 10px; color: var(--text-2); line-height: 1.6;
+  font-family: 'DM Mono', monospace;
+}
+
+/* tooltip — JS-driven, position:fixed (see script below) */
+#g-tooltip {
+  position: fixed; z-index: 9999; pointer-events: none;
+  background: #111111; border: 1px solid #374151;
+  color: #F9FAFB; font-family: 'DM Mono', monospace;
+  font-size: 10px; line-height: 1.55; padding: 8px 13px;
+  border-radius: 6px; max-width: 420px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+  opacity: 0; transition: opacity 0.12s;
+  white-space: normal;
+}
+
+/* colored top-bar on mgmt boxes */
+/* uniform gold top — one brand color, no color rainbow */
+.svc-box.c-green,
+.svc-box.c-blue,
+.svc-box.c-red,
+.svc-box.c-orange { border-top: 3px solid var(--gold); }
+
+/* ── PLATFORM PANELS ────────────────────────── */
+.plat-panels { display:grid; grid-template-columns:1fr; gap:12px; }
+
+.plat-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 13px;
+  box-shadow: var(--shadow-sm);
+}
+.panel-title {
+  font-family: 'Poppins', sans-serif; font-size: 10px; font-weight: 700;
+  color: var(--text-2); letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 11px; padding-bottom: 9px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 7px;
+}
+
+.tool-list { display: flex; flex-direction: column; gap: 7px; }
+.tool-item {
+  display: flex; align-items: flex-start; gap: 9px;
+  padding: 9px 10px; background: var(--bg-elevated);
+  border: 1px solid var(--border); border-radius: 6px;
+  transition: all 0.18s; cursor: default; position: relative;
+}
+.tool-item:hover {
+  border-color: var(--gold); background: #FFFDF5;
+  transform: translateX(2px);
+  box-shadow: 2px 0 0 var(--gold) inset;
+}
+.tool-item .ico { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.tool-item .tname {
+  font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600;
+  color: var(--text); display: block;
+}
+.tool-item .tdetail {
+  font-size: 10px; color: var(--text-2); font-family: 'DM Mono', monospace;
+  display: block; margin-top: 2px; line-height: 1.5;
+}
+
+/* catalog panel — same neutral, gold hover */
+
+/* obs panel — neutral, gold hover like all panels */
+.obs-connect {
+  margin-top: 10px; padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px; background: var(--bg-card);
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+}
+.obs-connect-detail {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  color: var(--text-2); line-height: 1.6;
+}
+.obs-connect-detail code {
+  color: var(--text-2); background: var(--bg-elevated);
+  padding: 1px 4px; border-radius: 3px; font-size: 9.5px;
+}
+
+/* ── CUSTOMER GRID ──────────────────────────── */
+.cust-grid {
+  display:grid; grid-template-columns:repeat(6,1fr); gap:11px;
+}
+
+.cust-col {
+  border: 1px solid var(--border); border-radius: 8px;
+  transition: box-shadow 0.2s; background: var(--bg-card);
+  border-top: 3px solid var(--gold);
+  box-shadow: var(--shadow);
+}
+.cust-col:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+.cust-col.future {
+  border-style: dashed; border-color: var(--text-3); opacity: 0.45;
+  border-top-style: dashed;
+}
+.cust-col.suspended {
+  border-style: dashed; border-color: var(--text-3); opacity: 0.45;
+  border-top-style: dashed;
+}
+.cust-col.suspended .cust-hdr { background: #F2F1EE; color: var(--text-3); }
+.cust-col.suspended .cust-hdr .abbr { color: var(--text-3); }
+
+.cust-hdr {
+  background: linear-gradient(135deg, #111111, #374151);
+  padding: 8px 10px; text-align: center;
+  font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 700;
+  color: var(--gold); letter-spacing: 0.04em; line-height: 1.4;
+  border-radius: 6px 6px 0 0;
+}
+.cust-hdr .abbr {
+  display: block; font-family: 'Poppins', sans-serif;
+  font-size: 9px; font-weight: 700; color: rgba(245,184,0,0.6);
+  letter-spacing: 0.14em; margin-top: 2px;
+}
+.cust-col.future .cust-hdr { background: #F2F1EE; color: var(--text-3); }
+.cust-col.future .cust-hdr .abbr { color: var(--text-3); }
+
+
+.cust-layers { padding: 8px; display: flex; flex-direction: column; gap: 5px; }
+
+.layer {
+  border-radius: 6px; padding: 7px 8px; border: 1px solid;
+}
+.layer.found { background: var(--bg-elevated); border-color: var(--border); }
+.layer.plat  { background: var(--bg-elevated); border-color: var(--border); }
+.layer.wl    { background: var(--bg-elevated); border-color: var(--border); }
+
+.layer .lbl {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 3px;
+}
+.layer.found .lbl { color: var(--text-2); }
+.layer.plat  .lbl { color: var(--text-2); }
+.layer.wl    .lbl { color: var(--gold-dark); }
+
+.layer .ldtl {
+  font-size: 9px; color: var(--text-2); font-family: 'DM Mono', monospace;
+  line-height: 1.7;
+}
+.layer .ldtl b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ── BOTTOM ROW ─────────────────────────────── */
+.bottom-row {
+  margin-bottom: 0;
+  border-radius: 10px;
+  animation: fadeUp 0.5s ease 0.3s both;
+}
+.bottom-row .tier-hdr {
+  background: var(--gloo-dark); border: 1px solid var(--gloo-dark-3);
+  border-bottom: none; color: #F9FAFB;
+}
+.bottom-row .tier-body { background: var(--bg-card); border-color: var(--border); }
+
+/* Foundation Blueprint bar */
+.foundation-blueprint {
+  margin-top: 12px;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  background: var(--bg-card);
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.blueprint-items {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+.blueprint-items b { color: var(--text); font-weight: 600; }
+.bp-sep { color: var(--text-3); }
+
+/* Portability bar — inside customer tier */
+.portability-bar {
+  margin-top: 12px;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  background: var(--bg-card);
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.port-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--gold-dark);
+  white-space: nowrap; flex-shrink: 0;
+}
+.port-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--text-2); line-height: 1.6;
+}
+
+.bot-box {
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px; background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+.bot-title {
+  font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 700;
+  color: var(--text-2); letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 10px; display: flex; align-items: center; gap: 7px;
+}
+.dx-flow {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  font-size: 10px; color: var(--text-2); font-family: 'DM Mono', monospace;
+}
+.dx-node {
+  padding: 3px 9px; border: 1px solid var(--border-2);
+  border-radius: 4px; background: var(--bg-elevated); font-size: 10px;
+}
+.dx-arr { color: var(--text-3); font-size: 12px; }
+.bot-note {
+  margin-top: 9px; font-size: 10px; color: var(--text-3);
+  font-family: 'DM Mono', monospace; line-height: 1.7;
+}
+
+/* ── GOVERNANCE CARDS ───────────────────────── */
+.gov-section {
+  margin-top: 20px;
+  animation: fadeUp 0.5s ease 0.4s both;
+}
+.gov-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-2);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.gov-title::before {
+  content: ''; display: block;
+  width: 20px; height: 1px; background: var(--text-3);
+}
+.gov-title::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.gov-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+.gov-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  border-top: 3px solid;
+  padding: 14px 14px 12px;
+  box-shadow: var(--shadow);
+}
+.gov-card.c-green { border-top-color: var(--green); }
+.gov-card.c-blue  { border-top-color: var(--blue); }
+.gov-card.c-orange{ border-top-color: var(--gold); }
+.gov-card.c-red   { border-top-color: var(--red); }
+.gov-card.c-purple{ border-top-color: var(--purple); }
+
+.gov-card-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px; font-weight: 700; color: var(--text);
+  margin-bottom: 10px; display: flex; align-items: center; gap: 7px;
+}
+.gov-card-title .ico { font-size: 15px; }
+.gov-card ul {
+  list-style: none; display: flex; flex-direction: column; gap: 5px;
+}
+.gov-card ul li {
+  font-size: 10px; color: var(--text-2);
+  font-family: 'DM Mono', monospace;
+  line-height: 1.5;
+  padding-left: 12px; position: relative;
+}
+.gov-card ul li::before {
+  content: '›'; position: absolute; left: 0;
+  color: var(--text-3);
+}
+.gov-card .aws-tag {
+  display: inline-block; margin-top: 8px;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 2px 7px;
+  border-radius: 4px; border: 1px solid var(--border-2);
+  color: var(--text-3); font-family: 'Poppins', sans-serif;
+}
+
+/* ── LEGEND ─────────────────────────────────── */
+.legend {
+  margin-top: 18px;
+  padding: 13px 18px;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+  animation: fadeUp 0.55s ease 0.4s both;
+  box-shadow: var(--shadow);
+}
+.leg-title {
+  font-family: 'Poppins', sans-serif; font-size: 10px; font-weight: 700;
+  color: var(--text-3); letter-spacing: 0.12em; text-transform: uppercase;
+}
+.leg-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10px; color: var(--text-2); font-family: 'DM Mono', monospace;
+  white-space: nowrap;
+}
+.leg-line { width:28px; height:2px; flex-shrink:0; border-radius:1px; }
+.leg-dash {
+  width:28px; height:2px; flex-shrink:0;
+  background:repeating-linear-gradient(90deg,currentColor 0px,currentColor 5px,transparent 5px,transparent 9px);
+}
+.leg-swatch {
+  width:10px; height:10px; border-radius:2px; flex-shrink:0;
+}
+.leg-sep {
+  width:1px; height:18px; background:var(--border-2); flex-shrink:0;
+  margin: 0 4px;
+}
+
+/* ── TAB NAV ──────────────────────────── */
+.tab-nav {
+  display: flex; gap: 4px;
+  margin-bottom: 20px;
+}
+.tab-btn {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+  padding: 8px 20px; border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-card); color: var(--text-2);
+  cursor: pointer; transition: all 0.15s;
+}
+.tab-btn:hover { color: var(--text); border-color: var(--gold); }
+.tab-btn.active {
+  background: var(--gloo-dark); color: var(--gold);
+  border-color: var(--gloo-dark-3);
+}
+
+/* ── EXECUTIVE SUMMARY ────────────────── */
+.exec-summary {
+  display: none;
+  max-width: 820px; margin: 0 auto;
+  animation: fadeUp 0.4s ease both;
+}
+.exec-summary.visible { display: block; }
+.exec-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
+  border-radius: 10px; padding: 40px 48px;
+  box-shadow: var(--shadow);
+}
+.exec-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 16px;
+}
+.exec-title {
+  font-size: 26px; font-weight: 800; letter-spacing: -0.02em;
+  color: var(--text); margin-bottom: 24px; line-height: 1.2;
+}
+.exec-title em {
+  background: linear-gradient(90deg, #F9D423, #E8950A);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; font-style: normal;
+}
+.exec-para {
+  font-size: 15px; font-weight: 400; line-height: 1.75;
+  color: var(--text-2); margin-bottom: 36px;
+  border-bottom: 1px solid var(--border); padding-bottom: 32px;
+}
+.exec-highlights-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-3);
+  margin-bottom: 18px;
+}
+.exec-highlights-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px;
+}
+.exec-list {
+  list-style: none; display: flex; flex-direction: column; gap: 14px;
+}
+.exec-list li {
+  display: flex; gap: 14px; align-items: flex-start;
+  font-size: 14px; line-height: 1.65; color: var(--text-2);
+}
+.exec-list li::before {
+  content: '';
+  display: block; flex-shrink: 0;
+  width: 3px; height: 3px; border-radius: 50%;
+  background: var(--gold); margin-top: 10px;
+}
+.exec-list li strong { color: var(--text); font-weight: 600; }
+
+/* ── HEADER BUTTONS ───────────────────── */
+.hdr-btn {
+  font-size: 14px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; line-height: 1;
+}
+.hdr-btn:hover { border-color: var(--gold); background: #FFFDF5; transform: scale(1.08); }
+
+/* ── DARK MODE ────────────────────────── */
+html.dark {
+  --bg:           #111111;
+  --bg-card:      #1C1C1C;
+  --bg-elevated:  #252525;
+  --gloo-dark:    #0A0A0A;
+  --gloo-dark-2:  #111111;
+  --gloo-dark-3:  #2D2D2D;
+  --text:         #F0F0F0;
+  --text-2:       #9CA3AF;
+  --text-3:       #6B7280;
+  --border:       #2D2D2D;
+  --border-2:     #3A3A3A;
+  --shadow-sm:    0 1px 3px rgba(0,0,0,0.4);
+  --shadow:       0 2px 8px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.4);
+}
+html.dark .hdr-btn:hover { background: #1C1500; }
+
+/* tier body hardcoded backgrounds → dark */
+html.dark .t-mgmt .tier-body,
+html.dark .t-plat .tier-body,
+html.dark .t-cust .tier-body,
+html.dark .t-cat .tier-body,
+html.dark .t-tool .tier-body,
+html.dark .t-obs .tier-body,
+html.dark .bottom-row .tier-body { background: var(--bg-card) !important; }
+
+html.dark .cust-col.future .cust-hdr,
+html.dark .cust-col.suspended .cust-hdr { background: #1C1C1C; color: var(--text-3); }
+html.dark .dx-node { background: var(--bg-elevated); }
+html.dark .tool-item { background: var(--bg-elevated); }
+html.dark .foundation-blueprint,
+html.dark .portability-bar,
+html.dark .obs-connect { background: var(--bg-card); border-color: var(--border); }
+html.dark body::before {
+  background:
+    radial-gradient(ellipse 60% 40% at 5% 5%, rgba(245,184,0,0.07) 0%, transparent 100%),
+    radial-gradient(ellipse 50% 30% at 95% 95%, rgba(245,184,0,0.04) 0%, transparent 100%);
+}
+
+/* ── PRINT ────────────────────────────── */
+@media print {
+  .hdr-btn, .title-badges { display: none !important; }
+  body { padding: 8px; background: white !important; }
+  body::before { display: none; }
+  .tier, .cust-col, .bot-box { break-inside: avoid; }
+  * { animation: none !important; transition: none !important; }
+  .tier-hdr, .cust-hdr { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .diagram { gap: 10px; }
+}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+<!-- TITLE -->
+<div class="title-bar">
+  <div>
+    <div class="title-main"><em>Gloo360</em> — Multi-Customer Cloud Architecture</div>
+    <div class="title-sub">Same cloud, same infrastructure, same security posture — for everyone.</div>
+  </div>
+  <div class="title-badges">
+    <div class="title-actions">
+      <button class="hdr-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+      <button class="hdr-btn" onclick="window.print()" title="Print">🖨️</button>
+    </div>
+    <div class="title-badge-row">
+      <div class="badge b-green">Control Tower</div>
+      <div class="badge b-blue">Multi-Account</div>
+      <div class="badge b-amber">N Customers</div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('exec')">Executive Summary</button>
+  <button class="tab-btn" onclick="switchTab('diagram')">Architecture</button>
+</div>
+
+<!-- EXECUTIVE SUMMARY -->
+<div class="exec-summary" id="view-exec">
+  <div class="exec-card">
+    <div class="exec-eyebrow">Platform Architecture</div>
+    <div class="exec-title">Overview</div>
+    <p class="exec-para">
+      Gloo360 delivers a fully managed, multi-tenant AWS cloud platform for mission-driven organizations. Every customer receives an identical, enterprise-grade landing zone — governed by the same security controls, automated by the same tooling, and observable through the same monitoring stack. Organizations retain complete data isolation while sharing the operational excellence of a centralized platform team. Gloo Corp itself runs on this platform, ensuring every capability is validated internally before customer deployment.
+    </p>
+    <div class="exec-highlights-title">Key Highlights</div>
+    <div class="exec-highlights-grid">
+      <ul class="exec-list">
+        <li><span><strong>Standardized landing zone</strong> — every customer OU is provisioned with five foundation accounts: Logging, Security, Network, Audit, and FinOps — applied automatically at onboarding.</span></li>
+        <li><span><strong>One OU per customer</strong> — each organization lives in a dedicated AWS Organizational Unit with full account isolation; no cross-customer access is possible by design.</span></li>
+        <li><span><strong>Automated onboarding</strong> — new customer OUs are provisioned in minutes with zero manual configuration; adding a customer means adding a directory and the platform handles the rest.</span></li>
+        <li><span><strong>FinOps by default</strong> — a standard cost tagging strategy, per-customer spend dashboards, and Budget alerts are provisioned automatically for every customer from day one.</span></li>
+        <li><span><strong>Gloo Corp as customer zero</strong> — Gloo's own operations run on the same platform under the same constraints, validating every feature before external deployment.</span></li>
+      </ul>
+      <ul class="exec-list">
+        <li><span><strong>Portability first</strong> — AWS provides infrastructure primitives (compute, storage, networking); open-source tools handle data and messaging so customers can move workloads between cloud providers without re-implementation.</span></li>
+        <li><span><strong>Centralized governance</strong> — Policy guardrails, WAF rules, threat detection, and security aggregation are managed at the organization level and applied to every customer account without exception.</span></li>
+        <li><span><strong>Security-approved services only</strong> — every cloud service in the platform has been reviewed by InfoSec with documented secure implementation guidelines; policy guardrails enforce the approved list across all customer accounts, preventing use of unvetted services.</span></li>
+        <li><span><strong>Platform Catalog</strong> — a curated library of golden path templates eliminates per-customer setup and enforces standards automatically.</span></li>
+        <li><span><strong>GitOps delivery</strong> — all customer clusters are managed from a central control plane; every deployment is auditable in Git with no direct production access.</span></li>
+        <li><span><strong>Full-stack observability</strong> — centralized metrics, logs, and distributed traces with per-customer tenant isolation; a single agent per cluster delivers full visibility without per-customer configuration.</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- DIAGRAM -->
+<div class="diagram" id="diagram">
+
+  <!-- ── TIER 1: MANAGEMENT ────────────────── -->
+  <div class="tier t-mgmt">
+    <div class="tier-hdr"><div class="dot"></div>Management Account (Root) — Gloo360 Org-Level Controls</div>
+    <div class="tier-body">
+      <div class="svc-row">
+
+        <div class="svc-box c-green has-tip" id="svc-ct" data-tip="Provisions new customer OUs via Account Factory for Terraform">
+          <span class="ico">🏗️</span>
+          <div class="name">Control Tower + SCPs</div>
+          <div class="detail">Account Factory<br>Guardrails · OU vending</div>
+        </div>
+
+        <div class="svc-box c-green has-tip" id="svc-sso" data-tip="Single sign-on for all Gloo360 engineers — time-limited sessions, no standing privilege">
+          <span class="ico">🔐</span>
+          <div class="name">IAM Identity Center</div>
+          <div class="detail">Cross-account roles<br>PoLP · SSO</div>
+        </div>
+
+        <div class="svc-box c-orange has-tip" id="svc-fm" data-tip="Push WAF rule groups and Shield Advanced policies to every customer account simultaneously">
+          <span class="ico">🛡️</span>
+          <div class="name">Firewall Manager</div>
+          <div class="detail">WAF · Shield Advanced<br>SG policies org-wide</div>
+        </div>
+
+        <div class="svc-box c-red has-tip" id="svc-sh" data-tip="Aggregates GuardDuty, Inspector, Macie, Config findings from all customer accounts into one view">
+          <span class="ico">🔒</span>
+          <div class="name">Security Hub</div>
+          <div class="detail">Org-level aggregator<br>Single pane of glass</div>
+        </div>
+
+        <div class="svc-box c-red has-tip" id="svc-gd" data-tip="ML-powered threat detection with delegated admin — findings route to each customer Security account">
+          <span class="ico">🎯</span>
+          <div class="name">GuardDuty</div>
+          <div class="detail">Org-level detection<br>Delegated admin</div>
+        </div>
+
+        <div class="svc-box c-blue has-tip" id="svc-ssm" data-tip="Apply CIS patch baselines and run automation runbooks across all customer EC2 and EKS nodes">
+          <span class="ico">⚡</span>
+          <div class="name">Systems Manager</div>
+          <div class="detail">Patch Manager<br>Automation runbooks</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PLATFORM CATALOG ─────────────────── -->
+  <div class="tier t-cat">
+    <div class="tier-hdr"><div class="dot"></div>Platform Catalog — Golden Path</div>
+    <div class="tier-body">
+
+        <!-- PLATFORM CATALOG -->
+        <div class="plat-panel">
+          <div class="panel-title">🗂️ Golden Path Templates</div>
+          <div class="tool-list">
+            <div class="tool-item has-tip" id="svc-helm" data-tip="gloo360-common library chart provides shared helpers (labels, annotations, naming). App templates for web service, background worker, and cronjob bake in resource limits, PDBs, HPA, and probes by default">
+              <span class="ico">⎈</span>
+              <div>
+                <span class="tname">Helm Chart Library</span>
+                <span class="tdetail">Library chart · web · worker · cronjob templates</span>
+              </div>
+            </div>
+            <div class="tool-item has-tip" id="svc-kyverno" data-tip="Kyverno policies enforce standards cluster-wide — images from approved ECR only, resource limits required, no privileged containers, PodDisruptionBudget required on all deployments">
+              <span class="ico">🛡️</span>
+              <div>
+                <span class="tname">Kyverno Policies</span>
+                <span class="tdetail">Image allowlist · resource guardrails · PDB required</span>
+              </div>
+            </div>
+            <div class="tool-item has-tip" id="svc-eso" data-tip="External Secrets Operator syncs secrets from AWS Secrets Manager into Kubernetes — no raw K8s Secrets, auto-rotation, standard SecretStore template per customer account">
+              <span class="ico">🔑</span>
+              <div>
+                <span class="tname">External Secrets (ESO)</span>
+                <span class="tdetail">Secrets Manager → K8s · auto-rotation</span>
+              </div>
+            </div>
+            <div class="tool-item has-tip" id="svc-dashboards" data-tip="Pre-built Grafana dashboards for EKS health, RDS, ElastiCache, and application RED metrics. Standard Loki alert rules for OOMKill, CrashLoopBackOff, pod evictions — each alert links to a runbook">
+              <span class="ico">📐</span>
+              <div>
+                <span class="tname">Observability Templates</span>
+                <span class="tdetail">Grafana dashboards · Loki alert rules · runbooks</span>
+              </div>
+            </div>
+            <div class="tool-item has-tip" id="svc-repotemplate" data-tip="gloo360/customer-template bootstraps a new customer repo with GitHub Actions workflows, ArgoCD Application definitions, Terraform module wiring, and Helm chart starter — all pre-configured">
+              <span class="ico">📋</span>
+              <div>
+                <span class="tname">GitOps Repo Template</span>
+                <span class="tdetail">Bootstrap repo · pipelines · ArgoCD · TF wired</span>
+              </div>
+            </div>
+            <div class="tool-item has-tip" id="svc-backstage" data-tip="Backstage developer portal — software catalog across all customer clusters, scaffolder for self-service new service creation, TechDocs pulled from repos. Adding a customer = no ops ticket required">
+              <span class="ico">🏠</span>
+              <div>
+                <span class="tname">Backstage</span>
+                <span class="tdetail">Service catalog · self-service scaffolder · TechDocs</span>
+              </div>
+            </div>
+            <div class="tool-item has-tip" id="svc-costtags" data-tip="Standard tag strategy (gloo360:customer, gloo360:env, gloo360:component) applied via Terraform modules — enables per-customer cost allocation, chargeback reports, and Budget alerts out of the box">
+              <span class="ico">🏷️</span>
+              <div>
+                <span class="tname">Cost Tagging Strategy</span>
+                <span class="tdetail">Standard tags · per-customer chargeback · Budget alerts</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    </div>
+  </div>
+
+  <!-- ── TIER 3: CUSTOMERS ─────────────────── -->
+  <div class="tier t-cust">
+    <div class="tier-hdr"><div class="dot"></div>Customer OUs — Standardized Landing Zone (identical structure per customer · isolated per OU)</div>
+    <div class="tier-body">
+      <div class="cust-grid">
+
+        <!-- GLOO CORP — internal -->
+        <div class="cust-col" id="col-gloo">
+          <div class="cust-hdr">
+            Gloo Corp
+            <span class="abbr">GLOO</span>
+          </div>
+          <div class="cust-layers">
+
+            <div class="layer plat" id="gloo-plat">
+              <span class="lbl">🚀 Platform</span>
+              <span class="ldtl">EKS · EC2<br>ECR · ElastiCache<br>RDS · S3 · EBS<br>CloudFront + WAF<br>Grafana Alloy</span>
+            </div>
+            <div class="layer wl" id="gloo-wl">
+              <span class="lbl">📁 Accounts</span>
+              <span class="ldtl">Dev · QA · Prod · Internal</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AG -->
+        <div class="cust-col" id="col-ag">
+          <div class="cust-hdr">Assemblies of God<span class="abbr">AG</span></div>
+          <div class="cust-layers">
+
+            <div class="layer plat" id="ag-plat">
+              <span class="lbl">🚀 Platform</span>
+              <span class="ldtl">EKS · EC2<br>ECR · ElastiCache<br>RDS · S3 · EBS<br>CloudFront + WAF<br>Grafana Alloy</span>
+            </div>
+            <div class="layer wl" id="ag-wl">
+              <span class="lbl">📁 Accounts</span>
+              <span class="ldtl">Dev · QA · Prod · Legal</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- IV -->
+        <div class="cust-col" id="col-iv">
+          <div class="cust-hdr">Intervarsity<span class="abbr">IV</span></div>
+          <div class="cust-layers">
+
+            <div class="layer plat" id="iv-plat">
+              <span class="lbl">🚀 Platform</span>
+              <span class="ldtl">EKS · EC2<br>ECR · ElastiCache<br>RDS · S3 · EBS<br>CloudFront + WAF<br>Grafana Alloy</span>
+            </div>
+            <div class="layer wl" id="iv-wl">
+              <span class="lbl">📁 Accounts</span>
+              <span class="ldtl">Dev · QA · Prod · Legal</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ABS -->
+        <div class="cust-col" id="col-abs">
+          <div class="cust-hdr">American Bible Society<span class="abbr">ABS</span></div>
+          <div class="cust-layers">
+
+            <div class="layer plat" id="abs-plat">
+              <span class="lbl">🚀 Platform</span>
+              <span class="ldtl">EKS · EC2<br>ECR · ElastiCache<br>RDS · S3 · EBS<br>CloudFront + WAF<br>Grafana Alloy</span>
+            </div>
+            <div class="layer wl" id="abs-wl">
+              <span class="lbl">📁 Accounts</span>
+              <span class="ldtl">Dev · QA · Prod · Legal</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MORE -->
+        <div class="cust-col future" id="col-more">
+          <div class="cust-hdr">Wycliffe · Jessup<br>+ Future Customers<span class="abbr">···</span></div>
+          <div class="cust-layers">
+
+            <div class="layer plat">
+              <span class="lbl">🚀 Platform</span>
+              <span class="ldtl">same services</span>
+            </div>
+            <div class="layer wl">
+              <span class="lbl">📁 Accounts</span>
+              <span class="ldtl">Dev · QA · Prod · Legal</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUSPENDED OU -->
+        <div class="cust-col suspended" id="col-suspended">
+          <div class="cust-hdr">Suspended OU<span class="abbr">🚫</span></div>
+          <div class="cust-layers">
+            <div class="layer" style="background:rgba(220,38,38,0.05);border-color:rgba(220,38,38,0.15);">
+              <span class="ldtl" style="color:var(--text-3);">Decommissioned accounts<br>SCP denies all API actions<br>Retained 90 days for audit<br>Then closed via Organizations</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Foundation Blueprint -->
+      <div class="foundation-blueprint">
+        <span class="port-label">🔒 Foundation Blueprint</span>
+        <span class="blueprint-items">
+          <span class="bp-item"><b>Logging</b> — S3 Object Lock · CloudTrail · VPC Flow Logs</span>
+          <span class="bp-sep">·</span>
+          <span class="bp-item"><b>Security</b> — GuardDuty · Inspector · Macie · IAM Analyzer</span>
+          <span class="bp-sep">·</span>
+          <span class="bp-item"><b>Network</b> — Transit Gateway · VPC Endpoints · Route 53</span>
+          <span class="bp-sep">·</span>
+          <span class="bp-item"><b>Audit</b> — Config Aggregator · Access Reports</span>
+          <span class="bp-sep">·</span>
+          <span class="bp-item"><b>FinOps</b> — Cost Explorer · Budgets · CUR · Cost Allocation Tags</span>
+        </span>
+      </div>
+
+      <!-- Portability principle -->
+
+    </div>
+  </div>
+
+  <!-- ── TOOLING ACCOUNT ──────────────────── -->
+  <div class="tier t-tool">
+    <div class="tier-hdr"><div class="dot"></div>Gloo360 Platform OU — Tooling</div>
+    <div class="tier-body">
+      <div class="plat-panel">
+        <div class="tool-list">
+          <div class="tool-item has-tip" id="svc-gh" data-tip="GitHub Actions assumes scoped IAM roles via OIDC — zero stored credentials anywhere">
+            <span class="ico">🐙</span>
+            <div>
+              <span class="tname">GitHub + GitHub Actions</span>
+              <span class="tdetail">OIDC → scoped IAM roles</span>
+            </div>
+          </div>
+          <div class="tool-item has-tip" id="svc-tg" data-tip="Terragrunt run-all apply deploys baseline IaC across all customer accounts in one command">
+            <span class="ico">🏔️</span>
+            <div>
+              <span class="tname">Terragrunt</span>
+              <span class="tdetail">multi-account IaC · S3 state + lock</span>
+            </div>
+          </div>
+          <div class="tool-item has-tip" id="svc-argo" data-tip="Central ArgoCD instance manages all customer EKS clusters via ApplicationSets with Git generator">
+            <span class="ico">🚀</span>
+            <div>
+              <span class="tname">ArgoCD Hub</span>
+              <span class="tdetail">ApplicationSets → all customer EKS clusters</span>
+            </div>
+          </div>
+          <div class="tool-item has-tip" id="svc-ib" data-tip="Nightly pipeline builds CIS-hardened Bottlerocket AMIs, auto-distributed to all customer accounts">
+            <span class="ico">🏭</span>
+            <div>
+              <span class="tname">EC2 Image Builder</span>
+              <span class="tdetail">Golden AMI · nightly CIS-hardened pipeline</span>
+            </div>
+          </div>
+          <div class="tool-item has-tip" id="svc-ecr" data-tip="Approved hardened base images replicated to each customer ECR via replication rules">
+            <span class="ico">📦</span>
+            <div>
+              <span class="tname">Shared ECR</span>
+              <span class="tdetail">Approved hardened base images · image signing</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── OBSERVABILITY TIER ───────────────── -->
+  <div class="tier t-obs">
+    <div class="tier-hdr"><div class="dot"></div>Observability Account — LGTM Stack on EKS · receives from all Customer OUs</div>
+    <div class="tier-body">
+      <div class="obs-grid">
+        <div class="tool-item has-tip" id="svc-graf" data-tip="Grafana for dashboards and alerting — multi-tenant via X-Scope-OrgID; Gloo360 ops see all customers, each customer sees only their own data">
+          <span class="ico">📊</span>
+          <div>
+            <span class="tname">Grafana</span>
+            <span class="tdetail">Dashboards · Alerting · SSO · multi-tenant</span>
+          </div>
+        </div>
+        <div class="tool-item has-tip" id="svc-loki" data-tip="Loki for log aggregation — lightweight, Kubernetes-native, S3 as object store backend; receives logs from Alloy agents via push API over TGW">
+          <span class="ico">📋</span>
+          <div>
+            <span class="tname">Loki</span>
+            <span class="tdetail">Log aggregation · S3 backend · LogQL</span>
+          </div>
+        </div>
+        <div class="tool-item has-tip" id="svc-mimir" data-tip="Mimir for long-term metrics — Prometheus-compatible remote_write endpoint, PromQL, S3 backend; replaces AMP with full portability">
+          <span class="ico">📈</span>
+          <div>
+            <span class="tname">Mimir</span>
+            <span class="tdetail">Metrics · Prometheus remote_write · PromQL</span>
+          </div>
+        </div>
+        <div class="tool-item has-tip" id="svc-tempo" data-tip="Tempo for distributed tracing — OTLP ingestion, S3 backend, trace correlation in Grafana via TraceID linking">
+          <span class="ico">🔍</span>
+          <div>
+            <span class="tname">Tempo</span>
+            <span class="tdetail">Distributed tracing · OTLP · S3 backend</span>
+          </div>
+        </div>
+      </div>
+      <div class="obs-connect">
+        <span class="port-label">🔗 Connectivity</span>
+        <span class="obs-connect-detail">Alloy agents → TGW → NLB → LGTM · Route 53 PHZ <code>obs.gloo360.internal</code> · tenant isolation via <code>X-Scope-OrgID</code></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BOTTOM ROW ────────────────────────── -->
+  <div class="bottom-row">
+    <div class="tier-hdr" style="border-radius:10px 10px 0 0;"><div class="dot"></div>On-Premises Migration Path — Temporary · Decommissioned Post-Cutover</div>
+    <div class="tier-body" style="border-color:var(--border);">
+      <div class="dx-flow">
+        <div class="dx-node">Customer DC</div>
+        <span class="dx-arr">──BGP──›</span>
+        <div class="dx-node">DX Location</div>
+        <span class="dx-arr">──1/10Gbps private VIF──›</span>
+        <div class="dx-node">DX Gateway</div>
+        <span class="dx-arr">──TGW attachment──›</span>
+        <div class="dx-node">Customer TGW</div>
+        <span class="dx-arr">──›</span>
+        <div class="dx-node">Customer VPCs</div>
+      </div>
+      <div class="bot-note">VPN backup during cutover window · AWS DataSync for bulk data · DMS for database migration · DX decommissioned post-migration</div>
+    </div>
+  </div>
+
+
+</div><!-- /diagram -->
+
+<!-- LEGEND -->
+
+</div><!-- /page-wrap -->
+
+<div id="g-tooltip"></div>
+
+<script>
+// ── Tooltip ──────────────────────────────
+(function() {
+  const tip = document.getElementById('g-tooltip');
+  let timer;
+  function pos(e) {
+    const pad = 14, vw = window.innerWidth, vh = window.innerHeight;
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    let x = e.clientX + pad, y = e.clientY - th - pad;
+    if (x + tw > vw - 8) x = e.clientX - tw - pad;
+    if (y < 8) y = e.clientY + pad;
+    tip.style.left = x + 'px';
+    tip.style.top  = y + 'px';
+  }
+  document.querySelectorAll('[data-tip]').forEach(el => {
+    el.addEventListener('mouseenter', function(e) {
+      clearTimeout(timer);
+      tip.textContent = this.dataset.tip;
+      tip.style.opacity = '1';
+      pos(e);
+    });
+    el.addEventListener('mousemove', pos);
+    el.addEventListener('mouseleave', function() {
+      timer = setTimeout(() => tip.style.opacity = '0', 80);
+    });
+  });
+})();
+
+// ── Tabs ─────────────────────────────────
+function switchTab(tab) {
+  const diagram = document.getElementById('diagram');
+  const exec    = document.getElementById('view-exec');
+  const btns    = document.querySelectorAll('.tab-btn');
+  if (tab === 'exec') {
+    diagram.style.display = 'none';
+    exec.classList.add('visible');
+    btns[0].classList.add('active');
+    btns[1].classList.remove('active');
+  } else {
+    diagram.style.display = '';
+    exec.classList.remove('visible');
+    btns[0].classList.remove('active');
+    btns[1].classList.add('active');
+  }
+}
+// default to Executive Summary on load
+document.addEventListener('DOMContentLoaded', () => switchTab('exec'));
+
+// ── Theme ─────────────────────────────────
+function toggleTheme() {
+  const isDark = document.documentElement.classList.toggle('dark');
+  document.getElementById('theme-btn').textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('gloo360-theme', isDark ? 'dark' : 'light');
+}
+// restore saved preference
+(function() {
+  if (localStorage.getItem('gloo360-theme') === 'dark') {
+    document.documentElement.classList.add('dark');
+    document.addEventListener('DOMContentLoaded', function() {
+      const btn = document.getElementById('theme-btn');
+      if (btn) btn.textContent = '☀️';
+    });
+  }
+})();
+</script>
+</body>
+</html>
