@@ -1127,8 +1127,11 @@ function switchTab(tab) {
     btns[1].classList.add('active');
   }
 }
-// default to Executive Summary on load
-document.addEventListener('DOMContentLoaded', () => switchTab('exec'));
+// default tab: ?tab=architecture → Architecture, everything else → Executive Summary
+document.addEventListener('DOMContentLoaded', () => {
+  const tab = new URLSearchParams(window.location.search).get('tab');
+  switchTab(tab === 'architecture' ? 'diagram' : 'exec');
+});
 
 // ── Theme ─────────────────────────────────
 function toggleTheme() {
