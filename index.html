@@ -720,6 +720,25 @@ html.dark body::before {
   * { animation: none !important; transition: none !important; }
   .tier-hdr, .cust-hdr { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .diagram { gap: 10px; }
+  .comments-section { display: none; }
+}
+
+/* ── Comments section ──────────────────────── */
+.comments-section {
+  max-width: 940px;
+  margin: 36px auto 56px;
+  padding: 0 24px;
+}
+.comments-hd {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
 }
 </style>
 </head>
@@ -1136,6 +1155,32 @@ html.dark body::before {
 
 </div><!-- /page-wrap -->
 
+<!-- COMMENTS -->
+<div class="comments-section">
+  <div class="comments-hd">Comments &amp; Feedback</div>
+  <script>
+  (function() {
+    const theme = localStorage.getItem('gloo360-theme') === 'dark' ? 'dark' : 'light';
+    const s = document.createElement('script');
+    s.src = 'https://giscus.app/client.js';
+    s.setAttribute('data-repo', 'darrenfurr/gloo360-architecture');
+    s.setAttribute('data-repo-id', 'R_kgDOSy2utA');
+    s.setAttribute('data-category', 'General');
+    s.setAttribute('data-category-id', 'DIC_kwDOSy2utM4C-2E9');
+    s.setAttribute('data-mapping', 'pathname');
+    s.setAttribute('data-strict', '0');
+    s.setAttribute('data-reactions-enabled', '1');
+    s.setAttribute('data-emit-metadata', '0');
+    s.setAttribute('data-input-position', 'top');
+    s.setAttribute('data-theme', theme);
+    s.setAttribute('data-lang', 'en');
+    s.setAttribute('crossorigin', 'anonymous');
+    s.async = true;
+    document.currentScript.parentElement.appendChild(s);
+  })();
+  </script>
+</div>
+
 <div id="g-tooltip"></div>
 
 <script>
@@ -1194,6 +1239,14 @@ function toggleTheme() {
   const isDark = document.documentElement.classList.toggle('dark');
   document.getElementById('theme-btn').textContent = isDark ? '☀️' : '🌙';
   localStorage.setItem('gloo360-theme', isDark ? 'dark' : 'light');
+  // Sync Giscus comment widget theme
+  const giscusFrame = document.querySelector('.giscus-frame');
+  if (giscusFrame) {
+    giscusFrame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: isDark ? 'dark' : 'light' } } },
+      'https://giscus.app'
+    );
+  }
 }
 // restore saved preference
 (function() {
