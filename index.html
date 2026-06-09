@@ -370,30 +370,76 @@ body::before {
 /* Foundation Blueprint bar */
 .foundation-blueprint {
   margin-top: 12px;
-  padding: 11px 14px;
+  padding: 14px 16px;
   border: 1px solid var(--border);
   border-left: 3px solid var(--gold);
   border-radius: 6px;
   background: var(--bg-card);
   display: flex;
-  align-items: baseline;
-  gap: 12px;
-  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0;
 }
-.blueprint-items {
+.fp-col {
   display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 6px;
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  color: var(--text-2);
-  line-height: 1.7;
+  flex-direction: column;
+  gap: 9px;
 }
-.blueprint-items b { color: var(--text); font-weight: 600; }
-.bp-sep { color: var(--text-3); }
-.bp-group-hd { color: var(--gold-dark); font-weight: 600; font-size: 9.5px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
-.bp-pipe { color: var(--border); font-size: 14px; margin: 0 4px; }
+.fp-per-ou {
+  min-width: 200px;
+  padding-right: 20px;
+}
+.fp-centralized {
+  flex: 1;
+  padding-left: 20px;
+}
+.fp-divider {
+  width: 1px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+.fp-section-hd {
+  font-family: 'Poppins', sans-serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.fp-network {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+.fp-bullet { color: var(--gold); font-size: 9px; line-height: 1.8; flex-shrink: 0; }
+.fp-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+.fp-detail {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--text-3);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+.fp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px 20px;
+}
+.fp-svc {
+  font-family: 'DM Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
 
 /* Portability bar — inside customer tier */
 .portability-bar {
@@ -950,20 +996,26 @@ html.dark body::before {
 
       <!-- Foundation Blueprint -->
       <div class="foundation-blueprint">
-        <span class="port-label">🔒 Foundation</span>
-        <span class="blueprint-items">
-          <span class="bp-group-hd">Per Customer OU:</span>
-          <span class="bp-item"><b>Network Account</b> — Transit Gateway · VPC Endpoints · Route 53 PHZ</span>
-          <span class="bp-pipe">│</span>
-          <span class="bp-group-hd">Centralized at Gloo360:</span>
-          <span class="bp-item"><b>Security</b> — GuardDuty · Inspector · Macie · IAM Analyzer</span>
-          <span class="bp-sep">·</span>
-          <span class="bp-item"><b>Logging</b> — CloudTrail · VPC Flow Logs · S3 Object Lock</span>
-          <span class="bp-sep">·</span>
-          <span class="bp-item"><b>Audit</b> — Config Aggregator · Access Reports</span>
-          <span class="bp-sep">·</span>
-          <span class="bp-item"><b>FinOps</b> — Cost Explorer · Budgets · CUR</span>
-        </span>
+        <div class="fp-col fp-per-ou">
+          <div class="fp-section-hd">Per Customer OU</div>
+          <div class="fp-network">
+            <span class="fp-bullet">■</span>
+            <div>
+              <div class="fp-name">Network Account</div>
+              <div class="fp-detail">TGW · VPC Endpoints · Route 53 PHZ</div>
+            </div>
+          </div>
+        </div>
+        <div class="fp-divider"></div>
+        <div class="fp-col fp-centralized">
+          <div class="fp-section-hd">Centralized at Gloo360</div>
+          <div class="fp-grid">
+            <div class="fp-svc"><span class="fp-bullet">■</span> Security</div>
+            <div class="fp-svc"><span class="fp-bullet">■</span> Logging</div>
+            <div class="fp-svc"><span class="fp-bullet">■</span> Audit</div>
+            <div class="fp-svc"><span class="fp-bullet">■</span> FinOps</div>
+          </div>
+        </div>
       </div>
 
       <!-- Portability principle -->
