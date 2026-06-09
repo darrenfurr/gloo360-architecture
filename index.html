@@ -392,6 +392,8 @@ body::before {
 }
 .blueprint-items b { color: var(--text); font-weight: 600; }
 .bp-sep { color: var(--text-3); }
+.bp-group-hd { color: var(--gold-dark); font-weight: 600; font-size: 9.5px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+.bp-pipe { color: var(--border); font-size: 14px; margin: 0 4px; }
 
 /* Portability bar — inside customer tier */
 .portability-bar {
@@ -714,7 +716,7 @@ html.dark body::before {
     <div class="exec-highlights-title">Key Highlights</div>
     <div class="exec-highlights-grid">
       <ul class="exec-list">
-        <li><span><strong>Standardized landing zone</strong> — every customer OU is provisioned with five foundation accounts: Logging, Security, Network, Audit, and FinOps — applied automatically at onboarding.</span></li>
+        <li><span><strong>Standardized landing zone</strong> — every customer OU is provisioned with a dedicated Network account for isolated VPC routing; logging, security, audit, and cost management aggregate directly to centralized Gloo360 accounts — all applied automatically at onboarding.</span></li>
         <li><span><strong>One OU per customer</strong> — each organization lives in a dedicated AWS Organizational Unit with full account isolation; no cross-customer access is possible by design.</span></li>
         <li><span><strong>Automated onboarding</strong> — new customer OUs are provisioned in minutes with zero manual configuration; adding a customer means adding a directory and the platform handles the rest.</span></li>
         <li><span><strong>FinOps by default</strong> — a standard cost tagging strategy, per-customer spend dashboards, and Budget alerts are provisioned automatically for every customer from day one.</span></li>
@@ -865,7 +867,7 @@ html.dark body::before {
             </div>
             <div class="layer wl" id="gloo-wl">
               <span class="lbl">📁 Accounts</span>
-              <span class="ldtl">Dev · QA · Prod · Internal</span>
+              <span class="ldtl">Network · Dev · QA · Prod · Legal</span>
             </div>
           </div>
         </div>
@@ -881,7 +883,7 @@ html.dark body::before {
             </div>
             <div class="layer wl" id="ag-wl">
               <span class="lbl">📁 Accounts</span>
-              <span class="ldtl">Dev · QA · Prod · Legal</span>
+              <span class="ldtl">Network · Dev · QA · Prod · Legal</span>
             </div>
           </div>
         </div>
@@ -897,7 +899,7 @@ html.dark body::before {
             </div>
             <div class="layer wl" id="iv-wl">
               <span class="lbl">📁 Accounts</span>
-              <span class="ldtl">Dev · QA · Prod · Legal</span>
+              <span class="ldtl">Network · Dev · QA · Prod · Legal</span>
             </div>
           </div>
         </div>
@@ -913,7 +915,7 @@ html.dark body::before {
             </div>
             <div class="layer wl" id="abs-wl">
               <span class="lbl">📁 Accounts</span>
-              <span class="ldtl">Dev · QA · Prod · Legal</span>
+              <span class="ldtl">Network · Dev · QA · Prod · Legal</span>
             </div>
           </div>
         </div>
@@ -929,7 +931,7 @@ html.dark body::before {
             </div>
             <div class="layer wl">
               <span class="lbl">📁 Accounts</span>
-              <span class="ldtl">Dev · QA · Prod · Legal</span>
+              <span class="ldtl">Network · Dev · QA · Prod · Legal</span>
             </div>
           </div>
         </div>
@@ -948,17 +950,19 @@ html.dark body::before {
 
       <!-- Foundation Blueprint -->
       <div class="foundation-blueprint">
-        <span class="port-label">🔒 Foundation Blueprint</span>
+        <span class="port-label">🔒 Foundation</span>
         <span class="blueprint-items">
-          <span class="bp-item"><b>Logging</b> — S3 Object Lock · CloudTrail · VPC Flow Logs</span>
-          <span class="bp-sep">·</span>
+          <span class="bp-group-hd">Per Customer OU:</span>
+          <span class="bp-item"><b>Network Account</b> — Transit Gateway · VPC Endpoints · Route 53 PHZ</span>
+          <span class="bp-pipe">│</span>
+          <span class="bp-group-hd">Centralized at Gloo360:</span>
           <span class="bp-item"><b>Security</b> — GuardDuty · Inspector · Macie · IAM Analyzer</span>
           <span class="bp-sep">·</span>
-          <span class="bp-item"><b>Network</b> — Transit Gateway · VPC Endpoints · Route 53</span>
+          <span class="bp-item"><b>Logging</b> — CloudTrail · VPC Flow Logs · S3 Object Lock</span>
           <span class="bp-sep">·</span>
           <span class="bp-item"><b>Audit</b> — Config Aggregator · Access Reports</span>
           <span class="bp-sep">·</span>
-          <span class="bp-item"><b>FinOps</b> — Cost Explorer · Budgets · CUR · Cost Allocation Tags</span>
+          <span class="bp-item"><b>FinOps</b> — Cost Explorer · Budgets · CUR</span>
         </span>
       </div>
 
