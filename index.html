@@ -712,15 +712,52 @@ html.dark body::before {
 }
 
 /* ── PRINT ────────────────────────────── */
+@page { size: landscape; margin: 6mm; }
+
 @media print {
-  .hdr-btn, .title-badges { display: none !important; }
-  body { padding: 8px; background: white !important; }
-  body::before { display: none; }
-  .tier, .cust-col, .bot-box { break-inside: avoid; }
-  * { animation: none !important; transition: none !important; }
-  .tier-hdr, .cust-hdr { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .diagram { gap: 10px; }
-  .comments-section { display: none; }
+  /* ── Reset ── */
+  html, body {
+    margin: 0 !important; padding: 0 !important;
+    background: white !important; width: 100%;
+  }
+  body::before { display: none !important; }
+
+  /* ── Hide UI chrome ── */
+  .hdr-btn, .title-badges, .tab-nav,
+  .comments-section { display: none !important; }
+
+  /* ── Always show diagram, hide exec summary ── */
+  #view-exec  { display: none !important; }
+  #diagram    { display: grid !important; }
+
+  /* ── Scale entire page to fit landscape ── */
+  .page-wrap {
+    max-width: 100% !important;
+    padding: 2px 4px !important;
+    margin: 0 !important;
+    zoom: 0.65;
+  }
+
+  /* ── Tighten spacing ── */
+  .title-bar  { padding: 4px 6px 6px !important; }
+  .title-main { font-size: 15px !important; }
+  .title-sub  { font-size: 9px !important; }
+  .diagram    { gap: 8px !important; }
+  .tier-body  { padding: 10px 12px !important; }
+  .svc-row    { gap: 8px !important; }
+  .obs-grid   { gap: 8px !important; }
+
+  /* ── Force all backgrounds & colors to print ── */
+  * {
+    animation: none !important;
+    transition: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* ── Single page — no breaks ── */
+  .diagram, .tier, .cust-col, .bot-box { break-inside: avoid; }
+  html { page-break-after: avoid; }
 }
 
 /* ── Comments section ──────────────────────── */
