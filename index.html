@@ -712,13 +712,20 @@ html.dark body::before {
 }
 
 /* ── PRINT ────────────────────────────── */
-@page { size: landscape; margin: 6mm; }
+@page { size: landscape; margin: 5mm; }
 
 @media print {
-  /* ── Reset ── */
-  html, body {
-    margin: 0 !important; padding: 0 !important;
-    background: white !important; width: 100%;
+  /* ── Root zoom — this is what actually controls page-break pagination ── */
+  html {
+    zoom: 0.58;
+    background: white !important;
+  }
+
+  /* ── Reset body ── */
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
   }
   body::before { display: none !important; }
 
@@ -727,25 +734,22 @@ html.dark body::before {
   .comments-section { display: none !important; }
 
   /* ── Always show diagram, hide exec summary ── */
-  #view-exec  { display: none !important; }
-  #diagram    { display: grid !important; }
+  #view-exec { display: none !important; }
+  #diagram   { display: grid !important; }
 
-  /* ── Scale entire page to fit landscape ── */
+  /* ── Page wrap ── */
   .page-wrap {
     max-width: 100% !important;
-    padding: 2px 4px !important;
+    padding: 4px 8px !important;
     margin: 0 !important;
-    zoom: 0.65;
   }
 
   /* ── Tighten spacing ── */
-  .title-bar  { padding: 4px 6px 6px !important; }
-  .title-main { font-size: 15px !important; }
-  .title-sub  { font-size: 9px !important; }
-  .diagram    { gap: 8px !important; }
-  .tier-body  { padding: 10px 12px !important; }
-  .svc-row    { gap: 8px !important; }
-  .obs-grid   { gap: 8px !important; }
+  .title-bar { padding: 6px 8px 8px !important; }
+  .diagram   { gap: 10px !important; }
+
+  /* ── No page breaks inside the diagram ── */
+  .diagram { break-inside: avoid; page-break-inside: avoid; }
 
   /* ── Force all backgrounds & colors to print ── */
   * {
@@ -754,10 +758,6 @@ html.dark body::before {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-
-  /* ── Single page — no breaks ── */
-  .diagram, .tier, .cust-col, .bot-box { break-inside: avoid; }
-  html { page-break-after: avoid; }
 }
 
 /* ── Comments section ──────────────────────── */
