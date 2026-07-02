@@ -1097,7 +1097,7 @@ html.dark .gantt-ms-row { background: var(--bg-elevated); }
   <div class="backlog-intro">
     <div class="exec-eyebrow">Implementation Plan</div>
     <div class="backlog-title">Sprint Backlog</div>
-    <div class="backlog-meta">7 epics · 45 stories · Critical path: E1 → E2 → E3 → E4 · Observability parallel after E4 Network account</div>
+    <div class="backlog-meta">8 epics · 55 stories · Critical path: E1 → E2 → E3 → E4 · Observability parallel after E4 Network account · E8 long-tail migration</div>
   </div>
   <div class="backlog-epics">
 
@@ -1210,7 +1210,7 @@ html.dark .gantt-ms-row { background: var(--bg-elevated); }
     <div class="bl-epic">
       <div class="bl-epic-hdr">
         <span class="bl-epic-num">E6</span>
-        <span class="bl-epic-title">Scaled Customer Onboarding</span>
+        <span class="bl-epic-title">Pilot Customer Onboarding</span>
         <span class="badge b-blue">After E4 + E5</span>
         <span class="bl-verdict">~95% Terraform</span>
         <span class="bl-epic-count">7 stories</span>
@@ -1241,6 +1241,30 @@ html.dark .gantt-ms-row { background: var(--bg-elevated); }
         <div class="bl-story"><div class="bl-story-title">Backstage deployed</div><div class="bl-story-ac">Portal accessible to Gloo360 engineers; software catalog auto-populated from repos</div><div class="bl-story-note">Terraform + Helm + manual config. App runs on EKS; catalog entity YAML and integrations require manual authoring.</div></div>
         <div class="bl-story"><div class="bl-story-title">Scaffolder templates wired</div><div class="bl-story-ac">New service creation via Backstage UI creates repo + ArgoCD app + TF wiring automatically</div><div class="bl-story-note">Code. Agent writes scaffolder template YAML + action scripts. Significant iteration expected.</div></div>
         <div class="bl-story"><div class="bl-story-title">TechDocs integrated</div><div class="bl-story-ac">Runbooks and architecture docs surfaced from repos in Backstage portal</div><div class="bl-story-note">Code. mkdocs.yaml + GitHub Actions publish pipeline per repo. Agent writes pipeline config.</div></div>
+      </div>
+    </div>
+
+    <!-- E8 -->
+    <div class="bl-epic">
+      <div class="bl-epic-hdr">
+        <span class="bl-epic-num">E8</span>
+        <span class="bl-epic-title">Scaled Customer Onboarding — Existing Infrastructure Migration</span>
+        <span class="badge b-amber">Long-tail · After E6</span>
+        <span class="bl-verdict">~70% Terraform</span>
+        <span class="bl-epic-count">10 stories</span>
+      </div>
+      <div class="bl-epic-body">
+        <div class="bl-col-hdr"><span>Story</span><span>Acceptance Criteria</span><span>Notes</span></div>
+        <div class="bl-story"><div class="bl-story-title">Infrastructure discovery + migration assessment</div><div class="bl-story-ac">Current state documented per customer — compute, storage, networking, databases, data volumes, dependencies</div><div class="bl-story-note">Manual. Architecture review sessions with each customer. No Terraform — input to all downstream migration stories.</div></div>
+        <div class="bl-story"><div class="bl-story-title">DirectConnect provisioning (per customer)</div><div class="bl-story-ac">DX circuit provisioned; BGP peering established; private VIF attached to customer TGW</div><div class="bl-story-note">60–90 day AWS lead time — initiate immediately after assessment. Terraform manages DX Gateway + VIF config; circuit order is manual.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Site-to-Site VPN (interim + DX backup)</div><div class="bl-story-ac">VPN tunnel live to customer on-premises; serves as connectivity bridge until DX arrives and as backup post-cutover</div><div class="bl-story-note">Terraform. aws_vpn_gateway + aws_vpn_connection. Deploy before DX arrives to enable early migration work.</div></div>
+        <div class="bl-story"><div class="bl-story-title">AWS DataSync — bulk data migration</div><div class="bl-story-ac">On-premises data replicated to S3/EFS; delta sync running; replication lag under agreed threshold</div><div class="bl-story-note">Terraform. aws_datasync_task + agent configuration. DataSync agent installed on-premises by customer IT team.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Database Migration Service (DMS)</div><div class="bl-story-ac">DMS replication instance running; source and target endpoints configured; ongoing CDC replication active with zero data loss</div><div class="bl-story-note">Terraform. aws_dms_replication_instance + endpoints + replication tasks. Agent writes; engineer validates schema compatibility per customer DB.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Application migration + containerization</div><div class="bl-story-ac">All customer workloads running on EKS or EC2 in AWS; health checks passing; feature parity with on-premises confirmed</div><div class="bl-story-note">Per-customer, per-application effort — most variable story in the epic. Agents help write Helm charts and Dockerfiles where applicable.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Parallel run validation</div><div class="bl-story-ac">Both on-premises and AWS environments serving traffic concurrently; no data divergence detected; customer sign-off obtained</div><div class="bl-story-note">Manual coordination with each customer. Load testing required. LGTM dashboards used to compare both environments.</div></div>
+        <div class="bl-story"><div class="bl-story-title">DNS cutover + traffic switch</div><div class="bl-story-ac">All DNS records updated to AWS endpoints; 100% of traffic routing through AWS; on-premises serving zero requests</div><div class="bl-story-note">Terraform for Route 53 record updates (low TTL pre-staged). Cutover timing and customer coordination is manual.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Post-cutover validation + monitoring</div><div class="bl-story-ac">72-hour observation window complete; all alerts green; error rates within SLA; customer sign-off obtained</div><div class="bl-story-note">Manual observation. Alloy + LGTM dashboards primary validation surface. Rollback plan must be documented before cutover begins.</div></div>
+        <div class="bl-story"><div class="bl-story-title">On-premises + DX decommission</div><div class="bl-story-ac">On-premises infrastructure shut down; DX circuit terminated; accounts moved to Suspended OU; retained 90 days then closed</div><div class="bl-story-note">Manual. 90-day retention in Suspended OU per architecture. DX termination requires AWS support ticket. Per-customer sequenced after stable observation window.</div></div>
       </div>
     </div>
 
@@ -1328,7 +1352,7 @@ html.dark .gantt-ms-row { background: var(--bg-elevated); }
 
       <!-- E6 -->
       <div class="gantt-row">
-        <div class="gantt-lbl"><span class="gantt-enum">E6</span><span class="gantt-ename">Scaled Customer Onboarding</span></div>
+        <div class="gantt-lbl"><span class="gantt-enum">E6</span><span class="gantt-ename">Pilot Customer Onboarding</span></div>
         <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
         <div class="gantt-cell"><div class="g-bar par dim">prep</div></div>
         <div class="gantt-cell"><div class="g-bar par">AG · IV · ABS</div></div>
@@ -1340,6 +1364,14 @@ html.dark .gantt-ms-row { background: var(--bg-elevated); }
         <div class="gantt-lbl"><span class="gantt-enum">E7</span><span class="gantt-ename">Platform Catalog — Backstage</span></div>
         <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
         <div class="gantt-cell"><div class="g-bar low">ongoing</div></div>
+      </div>
+
+      <!-- E8 -->
+      <div class="gantt-row">
+        <div class="gantt-lbl"><span class="gantt-enum">E8</span><span class="gantt-ename">Scaled Onboarding — Migration</span></div>
+        <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+        <div class="gantt-cell"><div class="g-bar low dim">DX · assess</div></div>
+        <div class="gantt-cell"><div class="g-bar low">long-tail · per customer</div></div>
       </div>
 
       <!-- Milestone row -->
