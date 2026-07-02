@@ -810,7 +810,7 @@ html.dark body::before {
 .bl-epic-body { background: var(--bg-card); }
 
 .bl-col-hdr {
-  display: grid; grid-template-columns: 2fr 3fr;
+  display: grid; grid-template-columns: 2fr 3fr 2fr;
   padding: 7px 18px;
   background: var(--bg-elevated);
   border-bottom: 1px solid var(--border);
@@ -822,7 +822,7 @@ html.dark body::before {
 }
 
 .bl-story {
-  display: grid; grid-template-columns: 2fr 3fr;
+  display: grid; grid-template-columns: 2fr 3fr 2fr;
   padding: 11px 18px;
   border-bottom: 1px solid var(--border);
   align-items: flex-start;
@@ -839,6 +839,20 @@ html.dark body::before {
 .bl-story-ac {
   font-family: 'DM Mono', monospace;
   font-size: 10.5px; color: var(--text-2); line-height: 1.65;
+  padding-right: 16px;
+}
+.bl-story-note {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--text-3); line-height: 1.65;
+  padding-left: 14px; border-left: 1px solid var(--border);
+}
+.bl-verdict {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: var(--text-3);
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.06);
+  padding: 2px 8px; border-radius: 4px;
+  flex-shrink: 0; white-space: nowrap;
 }
 
 html.dark .bl-story:hover { background: #1C1500; }
@@ -1093,18 +1107,19 @@ html.dark .gantt-ms-row { background: var(--bg-elevated); }
         <span class="bl-epic-num">E1</span>
         <span class="bl-epic-title">Management Account Bootstrap</span>
         <span class="badge b-green">Critical Path</span>
+        <span class="bl-verdict">~85% Terraform</span>
         <span class="bl-epic-count">8 stories</span>
       </div>
       <div class="bl-epic-body">
-        <div class="bl-col-hdr"><span>Story</span><span>Acceptance Criteria</span></div>
-        <div class="bl-story"><div class="bl-story-title">Enable Control Tower + Landing Zone</div><div class="bl-story-ac">CT enrolled; home region set; log archive + audit accounts provisioned by CT</div></div>
-        <div class="bl-story"><div class="bl-story-title">Baseline SCPs</div><div class="bl-story-ac">Deny root activity; require MFA; restrict to approved regions; deny account leaving org</div></div>
-        <div class="bl-story"><div class="bl-story-title">Enable IAM Identity Center</div><div class="bl-story-ac">SSO portal live; Gloo360 engineers can authenticate via SSO</div></div>
-        <div class="bl-story"><div class="bl-story-title">Create initial permission sets</div><div class="bl-story-ac">Admin, ReadOnly, NetworkAdmin, FinOps sets defined and assignable to accounts</div></div>
-        <div class="bl-story"><div class="bl-story-title">Enable GuardDuty org-wide</div><div class="bl-story-ac">GuardDuty active in all accounts; delegated admin set to Security account</div></div>
-        <div class="bl-story"><div class="bl-story-title">Enable Security Hub org-wide</div><div class="bl-story-ac">Security Hub aggregating to Security account; CIS benchmark standard enabled</div></div>
-        <div class="bl-story"><div class="bl-story-title">Enable Firewall Manager</div><div class="bl-story-ac">WAF managed rule groups + Shield Advanced policy applied org-wide</div></div>
-        <div class="bl-story"><div class="bl-story-title">Enable Systems Manager patch baselines</div><div class="bl-story-ac">CIS patch baseline assigned to all EC2 instances org-wide</div></div>
+        <div class="bl-col-hdr"><span>Story</span><span>Acceptance Criteria</span><span>Notes</span></div>
+        <div class="bl-story"><div class="bl-story-title">Enable Control Tower + Landing Zone</div><div class="bl-story-ac">CT enrolled; home region set; log archive + audit accounts provisioned by CT</div><div class="bl-story-note">Manual console setup — cannot be Terraformed. One-time ~2 hrs. All other E1 stories block on this.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Baseline SCPs</div><div class="bl-story-ac">Deny root activity; require MFA; restrict to approved regions; deny account leaving org</div><div class="bl-story-note">Terraform. aws_organizations_policy + aws_organizations_policy_attachment. Agent writes JSON policy docs.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Enable IAM Identity Center</div><div class="bl-story-ac">SSO portal live; Gloo360 engineers can authenticate via SSO</div><div class="bl-story-note">Mostly Terraform. Initial WorkOS SAML metadata exchange is a manual step; Terraform manages the resulting config.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Create initial permission sets</div><div class="bl-story-ac">Admin, ReadOnly, NetworkAdmin, FinOps sets defined and assignable to accounts</div><div class="bl-story-note">Terraform. aws_ssoadmin_permission_set + aws_ssoadmin_account_assignment. Fully declarative.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Enable GuardDuty org-wide</div><div class="bl-story-ac">GuardDuty active in all accounts; delegated admin set to Security account</div><div class="bl-story-note">Terraform. Depends on Security account (E2) existing first as delegated admin target.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Enable Security Hub org-wide</div><div class="bl-story-ac">Security Hub aggregating to Security account; CIS benchmark standard enabled</div><div class="bl-story-note">Terraform. aws_securityhub_organization_configuration. Same E2 dependency as GuardDuty.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Enable Firewall Manager</div><div class="bl-story-ac">WAF managed rule groups + Shield Advanced policy applied org-wide</div><div class="bl-story-note">Terraform. aws_fms_admin_account + aws_fms_policy.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Enable Systems Manager patch baselines</div><div class="bl-story-ac">CIS patch baseline assigned to all EC2 instances org-wide</div><div class="bl-story-note">Terraform. aws_ssm_patch_baseline + aws_ssm_patch_group.</div></div>
       </div>
     </div>
 
@@ -1114,14 +1129,15 @@ html.dark .gantt-ms-row { background: var(--bg-elevated); }
         <span class="bl-epic-num">E2</span>
         <span class="bl-epic-title">Centralized Foundation Accounts</span>
         <span class="badge b-green">Critical Path</span>
+        <span class="bl-verdict">~95% Terraform</span>
         <span class="bl-epic-count">4 stories</span>
       </div>
       <div class="bl-epic-body">
-        <div class="bl-col-hdr"><span>Story</span><span>Acceptance Criteria</span></div>
-        <div class="bl-story"><div class="bl-story-title">Configure Security account</div><div class="bl-story-ac">Delegated admin for GuardDuty + Security Hub; findings from all accounts visible in single pane</div></div>
-        <div class="bl-story"><div class="bl-story-title">Configure Logging account</div><div class="bl-story-ac">Org CloudTrail sink (S3 + KMS); VPC Flow Log aggregation bucket; retention policies set</div></div>
-        <div class="bl-story"><div class="bl-story-title">Configure Audit account</div><div class="bl-story-ac">AWS Config aggregator active; CIS Config rules deployed; non-compliant resources flagged</div></div>
-        <div class="bl-story"><div class="bl-story-title">Configure FinOps account</div><div class="bl-story-ac">Cost Categories defined per customer; Budgets with alert thresholds; tag enforcement Config rule active</div></div>
+        <div class="bl-col-hdr"><span>Story</span><span>Acceptance Criteria</span><span>Notes</span></div>
+        <div class="bl-story"><div class="bl-story-title">Configure Security account</div><div class="bl-story-ac">Delegated admin for GuardDuty + Security Hub; findings from all accounts visible in single pane</div><div class="bl-story-note">Terraform. Delegated admin set from management account; findings aggregation via aws_securityhub_finding_aggregator.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Configure Logging account</div><div class="bl-story-ac">Org CloudTrail sink (S3 + KMS); VPC Flow Log aggregation bucket; retention policies set</div><div class="bl-story-note">Terraform. aws_cloudtrail with is_organization_trail = true. S3 + KMS + lifecycle rules — all declarative.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Configure Audit account</div><div class="bl-story-ac">AWS Config aggregator active; CIS Config rules deployed; non-compliant resources flagged</div><div class="bl-story-note">Terraform. aws_config_configuration_aggregator + aws_config_organization_managed_rule + conformance packs.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Configure FinOps account</div><div class="bl-story-ac">Cost Categories defined per customer; Budgets with alert thresholds; tag enforcement Config rule active</div><div class="bl-story-note">Mostly Terraform. aws_budgets_budget + aws_ce_cost_category. Exception: Cost Allocation Tag activation requires one billing console click.</div></div>
       </div>
     </div>
 
@@ -1131,15 +1147,16 @@ html.dark .gantt-ms-row { background: var(--bg-elevated); }
         <span class="bl-epic-num">E3</span>
         <span class="bl-epic-title">IaC &amp; Automation Runway</span>
         <span class="badge b-green">Critical Path</span>
+        <span class="bl-verdict">~90% Terraform</span>
         <span class="bl-epic-count">5 stories</span>
       </div>
       <div class="bl-epic-body">
-        <div class="bl-col-hdr"><span>Story</span><span>Acceptance Criteria</span></div>
-        <div class="bl-story"><div class="bl-story-title">Provision Tooling account</div><div class="bl-story-ac">Account exists in Gloo360 Platform OU via Control Tower</div></div>
-        <div class="bl-story"><div class="bl-story-title">Wire AFT into Control Tower</div><div class="bl-story-ac">AFT pipeline can vend a new account end-to-end via a PR merge</div></div>
-        <div class="bl-story"><div class="bl-story-title">Terragrunt monorepo structure</div><div class="bl-story-ac">S3 backend + DynamoDB lock working; run-all apply deploys baseline across accounts</div></div>
-        <div class="bl-story"><div class="bl-story-title">GitHub Actions OIDC trust</div><div class="bl-story-ac">GitHub Actions assumes scoped IAM roles in management + foundation accounts; zero stored credentials</div></div>
-        <div class="bl-story"><div class="bl-story-title">Cost tagging baked into AFT modules</div><div class="bl-story-ac">Every provisioned account gets gloo360:customer, gloo360:env, gloo360:component tags automatically</div></div>
+        <div class="bl-col-hdr"><span>Story</span><span>Acceptance Criteria</span><span>Notes</span></div>
+        <div class="bl-story"><div class="bl-story-title">Provision Tooling account</div><div class="bl-story-ac">Account exists in Gloo360 Platform OU via Control Tower</div><div class="bl-story-note">AFT. Standard account vend via PR merge once AFT is wired.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Wire AFT into Control Tower</div><div class="bl-story-ac">AFT pipeline can vend a new account end-to-end via a PR merge</div><div class="bl-story-note">Terraform + partial manual. AFT infrastructure deployed via Terraform; CT integration has a one-time console registration step.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Terragrunt monorepo structure</div><div class="bl-story-ac">S3 backend + DynamoDB lock working; run-all apply deploys baseline across accounts</div><div class="bl-story-note">Terraform. Agent writes module hierarchy, S3 backend config, and lock table. No manual steps.</div></div>
+        <div class="bl-story"><div class="bl-story-title">GitHub Actions OIDC trust</div><div class="bl-story-ac">GitHub Actions assumes scoped IAM roles in management + foundation accounts; zero stored credentials</div><div class="bl-story-note">Terraform. aws_iam_openid_connect_provider + scoped IAM roles per account. Agent generates role policies.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Cost tagging baked into AFT modules</div><div class="bl-story-ac">Every provisioned account gets gloo360:customer, gloo360:env, gloo360:component tags automatically</div><div class="bl-story-note">Terraform. Tags injected via AFT account customizations — applied at vend time, no per-account manual step.</div></div>
       </div>
     </div>
 
@@ -1149,18 +1166,19 @@ html.dark .gantt-ms-row { background: var(--bg-elevated); }
         <span class="bl-epic-num">E4</span>
         <span class="bl-epic-title">Customer Zero — Gloo Corp OU</span>
         <span class="badge b-green">Critical Path</span>
+        <span class="bl-verdict">~90% Terraform</span>
         <span class="bl-epic-count">8 stories</span>
       </div>
       <div class="bl-epic-body">
-        <div class="bl-col-hdr"><span>Story</span><span>Acceptance Criteria</span></div>
-        <div class="bl-story"><div class="bl-story-title">Provision Gloo Corp OU via AFT</div><div class="bl-story-ac">OU exists in Organizations; AFT customizations applied</div></div>
-        <div class="bl-story"><div class="bl-story-title">Network account — TGW + VPCs</div><div class="bl-story-ac">TGW live; spoke VPCs attached; VPC Endpoints for AWS services; Route 53 PHZ wired</div></div>
-        <div class="bl-story"><div class="bl-story-title">Dev account via AFT</div><div class="bl-story-ac">Account provisioned; GuardDuty enrolled; Security Hub enrolled; baseline IAM roles present</div></div>
-        <div class="bl-story"><div class="bl-story-title">QA account via AFT</div><div class="bl-story-ac">Same as Dev account</div></div>
-        <div class="bl-story"><div class="bl-story-title">Prod account via AFT</div><div class="bl-story-ac">Same as Dev; Prod SCP applied (deny unapproved changes)</div></div>
-        <div class="bl-story"><div class="bl-story-title">Legal account via AFT</div><div class="bl-story-ac">Same as Dev; appropriate data residency controls applied</div></div>
-        <div class="bl-story"><div class="bl-story-title">SSO end-to-end validated</div><div class="bl-story-ac">Engineer can assume role in each Gloo Corp account via SSO; no long-lived credentials used</div></div>
-        <div class="bl-story"><div class="bl-story-title">Foundation data flow validated</div><div class="bl-story-ac">Security, Logging, Audit, and FinOps accounts receiving data from all Gloo Corp accounts</div></div>
+        <div class="bl-col-hdr"><span>Story</span><span>Acceptance Criteria</span><span>Notes</span></div>
+        <div class="bl-story"><div class="bl-story-title">Provision Gloo Corp OU via AFT</div><div class="bl-story-ac">OU exists in Organizations; AFT customizations applied</div><div class="bl-story-note">AFT. PR merge triggers pipeline; OU + account baseline applied automatically.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Network account — TGW + VPCs</div><div class="bl-story-ac">TGW live; spoke VPCs attached; VPC Endpoints for AWS services; Route 53 PHZ wired</div><div class="bl-story-note">Terraform. Complex but fully declarative — TGW, spoke VPCs, VPC Endpoints, PHZ. Agent writes; engineer reviews + applies.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Dev account via AFT</div><div class="bl-story-ac">Account provisioned; GuardDuty enrolled; Security Hub enrolled; baseline IAM roles present</div><div class="bl-story-note">AFT template. GuardDuty + Security Hub enrollment baked into account customization.</div></div>
+        <div class="bl-story"><div class="bl-story-title">QA account via AFT</div><div class="bl-story-ac">Same as Dev account</div><div class="bl-story-note">AFT template. Same customization as Dev — zero additional configuration.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Prod account via AFT</div><div class="bl-story-ac">Same as Dev; Prod SCP applied (deny unapproved changes)</div><div class="bl-story-note">AFT template + additional SCP attachment post-vend via Terraform.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Legal account via AFT</div><div class="bl-story-ac">Same as Dev; appropriate data residency controls applied</div><div class="bl-story-note">AFT template + data residency Config rules applied via Terraform customization.</div></div>
+        <div class="bl-story"><div class="bl-story-title">SSO end-to-end validated</div><div class="bl-story-ac">Engineer can assume role in each Gloo Corp account via SSO; no long-lived credentials used</div><div class="bl-story-note">Manual testing only. Engineers verify cross-account role assumption via SSO portal and CLI.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Foundation data flow validated</div><div class="bl-story-ac">Security, Logging, Audit, and FinOps accounts receiving data from all Gloo Corp accounts</div><div class="bl-story-note">Manual testing. Confirm findings, trails, config snapshots, and cost data flowing to all 4 centralized accounts.</div></div>
       </div>
     </div>
 
@@ -1170,20 +1188,21 @@ html.dark .gantt-ms-row { background: var(--bg-elevated); }
         <span class="bl-epic-num">E5</span>
         <span class="bl-epic-title">Observability Stack</span>
         <span class="badge b-blue">Parallel after E4 Network</span>
+        <span class="bl-verdict">~85% Terraform</span>
         <span class="bl-epic-count">10 stories</span>
       </div>
       <div class="bl-epic-body">
-        <div class="bl-col-hdr"><span>Story</span><span>Acceptance Criteria</span></div>
-        <div class="bl-story"><div class="bl-story-title">Provision Observability account + EKS cluster</div><div class="bl-story-ac">EKS cluster running in Observability account; node group using hardened AMI</div></div>
-        <div class="bl-story"><div class="bl-story-title">Shared ECR with approved base images</div><div class="bl-story-ac">Hardened base images available; replication rules to customer accounts configured</div></div>
-        <div class="bl-story"><div class="bl-story-title">EC2 Image Builder — Golden AMI pipeline</div><div class="bl-story-ac">Nightly CIS-hardened Bottlerocket AMI produced and distributed to all accounts</div></div>
-        <div class="bl-story"><div class="bl-story-title">Deploy LGTM stack</div><div class="bl-story-ac">Grafana, Loki, Mimir, Tempo running on EKS; S3 backends configured for each</div></div>
-        <div class="bl-story"><div class="bl-story-title">TGW attachment + PHZ obs.gloo360.internal</div><div class="bl-story-ac">Alloy agents in customer accounts reach LGTM NLB via private DNS; no public exposure</div></div>
-        <div class="bl-story"><div class="bl-story-title">Kyverno policies on Observability EKS</div><div class="bl-story-ac">Image allowlist, resource limits, PDB policies enforced on all pods</div></div>
-        <div class="bl-story"><div class="bl-story-title">External Secrets Operator on Observability EKS</div><div class="bl-story-ac">Secrets Manager secrets sync to K8s; no raw Secret objects in cluster</div></div>
-        <div class="bl-story"><div class="bl-story-title">Deploy Grafana Alloy to Gloo Corp</div><div class="bl-story-ac">Metrics, logs, and traces flowing from Gloo Corp cluster to LGTM stack</div></div>
-        <div class="bl-story"><div class="bl-story-title">Validate multi-tenant isolation</div><div class="bl-story-ac">Gloo Corp data visible with correct X-Scope-OrgID; no cross-tenant data leakage confirmed</div></div>
-        <div class="bl-story"><div class="bl-story-title">Observability templates deployed</div><div class="bl-story-ac">Standard Grafana dashboards + Loki alert rules live for Gloo Corp</div></div>
+        <div class="bl-col-hdr"><span>Story</span><span>Acceptance Criteria</span><span>Notes</span></div>
+        <div class="bl-story"><div class="bl-story-title">Provision Observability account + EKS cluster</div><div class="bl-story-ac">EKS cluster running in Observability account; node group using hardened AMI</div><div class="bl-story-note">Terraform. aws_eks_cluster + managed node group. Hardened AMI sourced from Image Builder pipeline.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Shared ECR with approved base images</div><div class="bl-story-ac">Hardened base images available; replication rules to customer accounts configured</div><div class="bl-story-note">Terraform. aws_ecr_repository + replication rules. Images pushed via GitHub Actions CI — not Terraform.</div></div>
+        <div class="bl-story"><div class="bl-story-title">EC2 Image Builder — Golden AMI pipeline</div><div class="bl-story-ac">Nightly CIS-hardened Bottlerocket AMI produced and distributed to all accounts</div><div class="bl-story-note">Terraform. aws_imagebuilder_image_pipeline + component documents. Agent writes component YAML.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Deploy LGTM stack</div><div class="bl-story-ac">Grafana, Loki, Mimir, Tempo running on EKS; S3 backends configured for each</div><div class="bl-story-note">Helm + GitOps. ArgoCD applies agent-written Helm values. S3 backends provisioned via Terraform.</div></div>
+        <div class="bl-story"><div class="bl-story-title">TGW attachment + PHZ obs.gloo360.internal</div><div class="bl-story-ac">Alloy agents in customer accounts reach LGTM NLB via private DNS; no public exposure</div><div class="bl-story-note">Terraform. TGW attachment + aws_route53_zone (private) + resolver rules. Fully declarative.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Kyverno policies on Observability EKS</div><div class="bl-story-ac">Image allowlist, resource limits, PDB policies enforced on all pods</div><div class="bl-story-note">GitOps. ClusterPolicy YAML applied via ArgoCD ApplicationSet. Agent writes policy definitions.</div></div>
+        <div class="bl-story"><div class="bl-story-title">External Secrets Operator on Observability EKS</div><div class="bl-story-ac">Secrets Manager secrets sync to K8s; no raw Secret objects in cluster</div><div class="bl-story-note">Helm + Terraform. ESO deployed via Helm; SecretStore CRs + backing IAM roles via Terraform.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Deploy Grafana Alloy to Gloo Corp</div><div class="bl-story-ac">Metrics, logs, and traces flowing from Gloo Corp cluster to LGTM stack</div><div class="bl-story-note">Helm via ArgoCD. ApplicationSet generates one Alloy release per customer cluster automatically.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Validate multi-tenant isolation</div><div class="bl-story-ac">Gloo Corp data visible with correct X-Scope-OrgID; no cross-tenant data leakage confirmed</div><div class="bl-story-note">Manual testing. Verify X-Scope-OrgID header enforcement; confirm no cross-tenant data visible in Grafana.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Observability templates deployed</div><div class="bl-story-ac">Standard Grafana dashboards + Loki alert rules live for Gloo Corp</div><div class="bl-story-note">GitOps. Dashboard JSON + alert rule YAML committed to git; ArgoCD syncs to Grafana automatically.</div></div>
       </div>
     </div>
 
@@ -1193,17 +1212,18 @@ html.dark .gantt-ms-row { background: var(--bg-elevated); }
         <span class="bl-epic-num">E6</span>
         <span class="bl-epic-title">Scaled Customer Onboarding</span>
         <span class="badge b-blue">After E4 + E5</span>
+        <span class="bl-verdict">~95% Terraform</span>
         <span class="bl-epic-count">7 stories</span>
       </div>
       <div class="bl-epic-body">
-        <div class="bl-col-hdr"><span>Story</span><span>Acceptance Criteria</span></div>
-        <div class="bl-story"><div class="bl-story-title">Helm Chart Library — web + worker + cronjob</div><div class="bl-story-ac">Templates deploy with resource limits, PDB, HPA, and probes baked in by default</div></div>
-        <div class="bl-story"><div class="bl-story-title">GitOps Repo Template</div><div class="bl-story-ac">New customer repo bootstrapped with GitHub Actions, ArgoCD ApplicationDefinitions, TF wiring in one command</div></div>
-        <div class="bl-story"><div class="bl-story-title">ArgoCD Hub deployed to Tooling account</div><div class="bl-story-ac">Central ArgoCD managing Gloo Corp EKS cluster via ApplicationSet with Git generator</div></div>
-        <div class="bl-story"><div class="bl-story-title">Onboarding runbook finalized</div><div class="bl-story-ac">Documented: provision OU → baseline accounts → connect obs → validate. End-to-end under 30 min</div></div>
-        <div class="bl-story"><div class="bl-story-title">Onboard Assemblies of God (AG)</div><div class="bl-story-ac">All E4–E5 steps completed for AG OU; observability flowing; SSO validated</div></div>
-        <div class="bl-story"><div class="bl-story-title">Onboard Intervarsity (IV)</div><div class="bl-story-ac">All E4–E5 steps completed for IV OU; observability flowing; SSO validated</div></div>
-        <div class="bl-story"><div class="bl-story-title">Onboard American Bible Society (ABS)</div><div class="bl-story-ac">All E4–E5 steps completed for ABS OU; observability flowing; SSO validated</div></div>
+        <div class="bl-col-hdr"><span>Story</span><span>Acceptance Criteria</span><span>Notes</span></div>
+        <div class="bl-story"><div class="bl-story-title">Helm Chart Library — web + worker + cronjob</div><div class="bl-story-ac">Templates deploy with resource limits, PDB, HPA, and probes baked in by default</div><div class="bl-story-note">Helm. Agent writes library chart helpers + app templates. Published to shared OCI registry.</div></div>
+        <div class="bl-story"><div class="bl-story-title">GitOps Repo Template</div><div class="bl-story-ac">New customer repo bootstrapped with GitHub Actions, ArgoCD ApplicationDefinitions, TF wiring in one command</div><div class="bl-story-note">Code. Agent scaffolds repo structure with all wiring pre-configured. One-time template authoring.</div></div>
+        <div class="bl-story"><div class="bl-story-title">ArgoCD Hub deployed to Tooling account</div><div class="bl-story-ac">Central ArgoCD managing Gloo Corp EKS cluster via ApplicationSet with Git generator</div><div class="bl-story-note">Terraform + Helm. ArgoCD installed via Helm; ApplicationSet resources managed via GitOps.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Onboarding runbook finalized</div><div class="bl-story-ac">Documented: provision OU → baseline accounts → connect obs → validate. End-to-end under 30 min</div><div class="bl-story-note">Documentation only. Captures the operational steps and validation checklist — not automatable.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Onboard Assemblies of God (AG)</div><div class="bl-story-ac">All E4–E5 steps completed for AG OU; observability flowing; SSO validated</div><div class="bl-story-note">Fully automated. AFT + Terragrunt pipeline; engineer monitors run and validates output.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Onboard Intervarsity (IV)</div><div class="bl-story-ac">All E4–E5 steps completed for IV OU; observability flowing; SSO validated</div><div class="bl-story-note">Fully automated. Same pipeline as AG — new customer = new directory + PR.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Onboard American Bible Society (ABS)</div><div class="bl-story-ac">All E4–E5 steps completed for ABS OU; observability flowing; SSO validated</div><div class="bl-story-note">Fully automated. Same pipeline as IV.</div></div>
       </div>
     </div>
 
@@ -1213,13 +1233,14 @@ html.dark .gantt-ms-row { background: var(--bg-elevated); }
         <span class="bl-epic-num">E7</span>
         <span class="bl-epic-title">Platform Catalog — Backstage</span>
         <span class="badge b-amber">Lower Priority</span>
+        <span class="bl-verdict">~60% Terraform</span>
         <span class="bl-epic-count">3 stories</span>
       </div>
       <div class="bl-epic-body">
-        <div class="bl-col-hdr"><span>Story</span><span>Acceptance Criteria</span></div>
-        <div class="bl-story"><div class="bl-story-title">Backstage deployed</div><div class="bl-story-ac">Portal accessible to Gloo360 engineers; software catalog auto-populated from repos</div></div>
-        <div class="bl-story"><div class="bl-story-title">Scaffolder templates wired</div><div class="bl-story-ac">New service creation via Backstage UI creates repo + ArgoCD app + TF wiring automatically</div></div>
-        <div class="bl-story"><div class="bl-story-title">TechDocs integrated</div><div class="bl-story-ac">Runbooks and architecture docs surfaced from repos in Backstage portal</div></div>
+        <div class="bl-col-hdr"><span>Story</span><span>Acceptance Criteria</span><span>Notes</span></div>
+        <div class="bl-story"><div class="bl-story-title">Backstage deployed</div><div class="bl-story-ac">Portal accessible to Gloo360 engineers; software catalog auto-populated from repos</div><div class="bl-story-note">Terraform + Helm + manual config. App runs on EKS; catalog entity YAML and integrations require manual authoring.</div></div>
+        <div class="bl-story"><div class="bl-story-title">Scaffolder templates wired</div><div class="bl-story-ac">New service creation via Backstage UI creates repo + ArgoCD app + TF wiring automatically</div><div class="bl-story-note">Code. Agent writes scaffolder template YAML + action scripts. Significant iteration expected.</div></div>
+        <div class="bl-story"><div class="bl-story-title">TechDocs integrated</div><div class="bl-story-ac">Runbooks and architecture docs surfaced from repos in Backstage portal</div><div class="bl-story-note">Code. mkdocs.yaml + GitHub Actions publish pipeline per repo. Agent writes pipeline config.</div></div>
       </div>
     </div>
 
